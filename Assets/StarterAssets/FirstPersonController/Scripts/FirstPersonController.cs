@@ -231,6 +231,11 @@ namespace StarterAssets
 					velocity.y = - FlyGravity;
 				}
 			}
+			else if(velocity.y < -FlySpeed * 0.75)
+			{
+                velocity.y *= FlyGravity * 2;
+                storedEnergy += -velocity.y;
+            }
 			else
 			{
 				velocity.y *= FlyGravity;
