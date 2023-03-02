@@ -22,6 +22,15 @@ namespace StarterAssets
 		public float SpeedChangeRate = 10.0f;
 
 		[Space(10)]
+		[Tooltip("Fly speed of the character in m/s")]
+		public float FlySpeed = 12.5f;
+		[Tooltip("The drag applied when flying in m/s")]
+		public float Drag = 6.0f;
+		public float FlyGravity = 1.0f;
+		private float storedEnergy; //The amount of energy being accumilated from freefall that the player can regain when going up.
+		public bool isFlying = false; //A bool to tell the controller which movement to use.
+
+		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
 		[Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
@@ -114,8 +123,15 @@ namespace StarterAssets
 		{
 			JumpAndGravity();
 			GroundedCheck();
-			Move();
-		}
+			if (!isFlying)
+			{
+                Move();
+            }
+			else
+			{
+				Fly();
+			}
+        }
 
 		private void LateUpdate()
 		{
@@ -198,7 +214,33 @@ namespace StarterAssets
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
 
-		private void JumpAndGravity()
+		private void Fly()
+		{
+			Vector3 velocity = CinemachineCameraTarget.transform.forward * FlySpeed;
+
+			if(velocity.y > 0)
+			{
+				storedEnergy -= velocity.y;
+				if(storedEnergy >= 1)
+				{
+					velocity.y -= FlyGravity / storedEnergy;
+				}
+				else
+				{
+					storedEnergy = 0;
+					velocity.y = - FlyGravity;
+				}
+			}
+			else
+			{
+				velocity.y *= FlyGravity;
+				storedEnergy += -velocity.y;
+			}
+
+            _controller.Move(velocity * Time.deltaTime);
+        }
+
+        private void JumpAndGravity()
 		{
 			if (Grounded)
 			{
