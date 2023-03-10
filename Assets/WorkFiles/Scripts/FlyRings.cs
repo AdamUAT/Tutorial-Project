@@ -51,6 +51,7 @@ public class FlyRings : MonoBehaviour
                     indicator.material = lightOn;
                     //Increases the time on the timer
                     GameManager.instance.AddTime(timerIncrease);
+                    GetComponent<AudioSource>().Play();
                     break;
                 case 1:
                     GameManager.instance.EnableTimer();
@@ -71,6 +72,7 @@ public class FlyRings : MonoBehaviour
                     //Stops the player flying
                     player.isFlying = false;
                     GameManager.instance.currentRespawnPoint = 2; //Sets the respawn point to the end of the flying course.
+                    GameManager.instance.GetComponent<AudioSource>().PlayOneShot(GameManager.instance.win);
                     break;
                 default:
                     break;

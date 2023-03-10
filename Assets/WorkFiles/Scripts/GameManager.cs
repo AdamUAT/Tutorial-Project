@@ -45,6 +45,11 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI timerDisplay;
     private float timer;
     private GameObject[] rings;
+    [SerializeField]
+    private AudioClip fail;
+    public AudioClip win;
+    [SerializeField]
+    private AudioClip start;
 
     public GameObject[] respawnPoints;
     public int currentRespawnPoint;
@@ -136,7 +141,9 @@ public class GameManager : MonoBehaviour
     public void EnableTimer()
     {
         timerDisplay.gameObject.SetActive(true);
+        GetComponent<AudioSource>().PlayOneShot(start);
     }
+
     public void DisableTimer()
     {
         timerDisplay.gameObject.SetActive(false);
@@ -187,6 +194,7 @@ public class GameManager : MonoBehaviour
         timerDisplay.gameObject.SetActive(false);
         player.GetComponent<FirstPersonController>().isFlying = false;
         RespawnPlayer();
+        GetComponent<AudioSource>().PlayOneShot(fail);
     }
     #endregion FlyRings
 
