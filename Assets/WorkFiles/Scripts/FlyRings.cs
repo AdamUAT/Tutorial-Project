@@ -61,6 +61,7 @@ public class FlyRings : MonoBehaviour
                     nextRing.state = 1;
                     //Starts the player flying
                     player.isFlying = true;
+                    GameManager.instance.currentRespawnPoint = 1; //Sets the respawn point to the top of the mountain.
                     break;
                 case 2:
                     GameManager.instance.DisableTimer();
@@ -69,6 +70,7 @@ public class FlyRings : MonoBehaviour
                     indicator.material = lightOn;
                     //Stops the player flying
                     player.isFlying = false;
+                    GameManager.instance.currentRespawnPoint = 2; //Sets the respawn point to the end of the flying course.
                     break;
                 default:
                     break;

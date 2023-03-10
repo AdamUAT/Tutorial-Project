@@ -5,6 +5,7 @@ using TMPro;
 using System.Linq;
 using StarterAssets;
 using UnityEditor.Experimental.Rendering;
+using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
@@ -45,12 +46,30 @@ public class GameManager : MonoBehaviour
     private float timer;
     private GameObject[] rings;
 
+    public GameObject[] respawnPoints;
+    public int currentRespawnPoint;
+    [SerializeField]
+    [Tooltip("A reference to the player prefab.")] //used to respawn the player.
+    private GameObject playerPrefab;
+    [SerializeField]
+    [Tooltip("A reference to the game object with the cinemachine virtual camera.")] //used to assign the camera to the respawned player.
+    private GameObject playerFollowCamera;
+
     public void AddCollectable()
     {
         collectablesCount++;
         collectablesDisplay.text = collectablesCount.ToString();
     }
 
+    /// <summary>
+    /// Deletes the current player and respawns a new one. Cannot simply teleport the player, since its movement overrides transform.position.
+    /// </summary>
+    public void RespawnPlayer()
+    {
+        Destroy(player);
+        player = Instantiate(playerPrefab, respawnPoints[currentRespawnPoint].transform.position, respawnPoints[currentRespawnPoint].transform.rotation);
+        playerFollowCamera.GetComponent<CinemachineVirtualCamera>().Follow = player.transform.GetChild(0).transform;
+    }
 
     #region FlyRings
 
@@ -138,8 +157,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void TimeOut()
     {
+        FailFlying();
+    }
+
+    public void FailFlying()
+    {
         //Hides all the rings except for the first ring and sets the first ring to blink.
-        foreach(GameObject ring in rings)
+        foreach (GameObject ring in rings)
         {
             FlyRings flyRing = ring.GetComponent<FlyRings>();
             if (flyRing != null)
@@ -158,9 +182,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        timer = 0;
         timerDisplay.text = "";
         timerDisplay.gameObject.SetActive(false);
         player.GetComponent<FirstPersonController>().isFlying = false;
+        RespawnPlayer();
     }
     #endregion FlyRings
 
@@ -186,6 +212,15 @@ public class GameManager : MonoBehaviour
         else if(timer <= 0 && timerDisplay.gameObject.activeInHierarchy == true ) //The second check ensures it the timer runs out only happens once.
         {
             TimeOut();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        //Checks to see if the player wants to do a manual respawn.
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RespawnPlayer();
         }
     }
 }
