@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using StarterAssets;
-using UnityEditor.Experimental.Rendering;
 using Cinemachine;
 
 public class GameManager : MonoBehaviour
@@ -71,6 +70,10 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RespawnPlayer()
     {
+        if(player.GetComponent<FirstPersonController>().isFlying)
+        {
+            FailFlying();
+        }
         Destroy(player);
         player = Instantiate(playerPrefab, respawnPoints[currentRespawnPoint].transform.position, respawnPoints[currentRespawnPoint].transform.rotation);
         playerFollowCamera.GetComponent<CinemachineVirtualCamera>().Follow = player.transform.GetChild(0).transform;
